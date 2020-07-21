@@ -1,8 +1,9 @@
 import React from 'react'
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 import App from './App';
 import {fetchShow as mockFetchshow }from './api/fetchShow';
+import { act } from 'react-dom/test-utils';
 
 jest.mock('./api/fetchShow')
 
@@ -608,7 +609,8 @@ const episodeData = {
 }
 
 test("Render App component without error",() => {
-    render(<App />)
+  mockFetchshow.mockResolvedValueOnce(episodeData);
+    render(<App />)  
 })
 test("Data is fetching and rendered correctly", async () => {
 
@@ -616,11 +618,17 @@ test("Data is fetching and rendered correctly", async () => {
 
     render(<App />);
 
-    userEvent.click(screen.getByText(/fetching data.../i));
-
-    await (async() => {
+    await waitFor(async() => {
         // make your assertion that will run _after_ the async operation finishes
-        expect(mockFetchshow).toHaveBeenCalledTimes(1)
+        expect(await screen.findByText(/select a season/i)).toBeInTheDocument()
       }); 
+      expect(mockFetchshow).toHaveBeenCalledTimes(2)
     screen.findByText(/chapter/i); 
 });
+test("Dropdown is render correct", () => {
+  mockFetchshow.mockResolvedValueOnce(episodeData);
+
+  render(<App />);
+
+  userEvent.click(screen.getByText(/fetching data.../i));
+})

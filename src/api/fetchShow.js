@@ -6,9 +6,10 @@ export const fetchShow = () => {
     .then(res => {
         console.log(res);
         return res;
-    })
+    }) 
     .catch(err => {
         console.log("error fetching data")
         return err;
     })
+   
 }
